@@ -1,0 +1,207 @@
+---
+output:
+  html_document:
+    keep_md: yes
+---
+Анализ зависимости количества обращений пользователей от числа обслуживаемых рабочих мест
+========================================================
+
+
+Целью анализа является построение модели, выявлеющей закономерность в количестве обращений пользователей от числа обслуживаемых рабочих мест.
+
+### Получение данных
+
+Загружаем исходные данные
+```{r}
+SCandPC.raw<-readRDS("SC_and_PC.RDa")
+# Dimension of dataset
+dim(SCandPC.raw)
+# First rows
+head(SCandPC.raw)
+```
+
+### Регрессионный анализ зависимости количества обращений пользователей от числа обслуживаемых рабочих мест как процесса
+
+Проведем анализ только по всем предприятиям, для чего просуммируем данные по всем предприятиям для каждого периода и построим линейную модель КМНК.
+
+```{r}
+SCandPC.sum<-aggregate(cbind(PC,SC)~Month+Year,data=SCandPC.raw,sum)
+dim(SCandPC.sum)
+head(SCandPC.sum)
+summary(lm0<-lm(SC~PC,data=SCandPC.sum))
+oldpar<-par(mfrow=c(2,2))
+plot(lm0)
+par(oldpar)
+
+```
+
+Проведем тесты  на авторегерессию и гетероскедатичность
+
+```{r}
+library(car)
+acf(residuals(lm0))
+ncvTest(lm0)
+```
+
+
+Дисперсионный анализ зависимости остатков модели от времени
+
+```{r}
+y<-residuals(lm0)
+x<-1:length(y)
+summary(lm(y~x))
+
+```
+
+Иными словами, остатки модели - белый шум. Построим другую модель, которая учитывает только зависимость количества обращений пользователей от числа обслуживаемых рабочих мест и не зависит от времени.
+
+### Построение предиктивной модели
+
+Для начала разделим данные на два блока: данные для построения модели и данные для её верификации
+
+```{r}
+total.rows<-dim(SCandPC.raw)[1]
+test.idx<-sample(1:total.rows,total.rows/4)
+SCandPC.test<-SCandPC.raw[test.idx,]
+dim(SCandPC.test)
+SCandPC.mdl<-SCandPC.raw[-test.idx,]
+dim(SCandPC.mdl)
+```
+
+#### Модель без учета размера предприятия
+
+```{r}
+summary(lm1<-lm(SC~PC,data=SCandPC.mdl))
+confint(lm1)
+
+```
+
+Полученный результат хорошо согласуется с ранее опубликованной моделью. После исключения свободного члена получаем
+
+```{r}
+summary(lm1.1<-lm(SC~PC-1,data=SCandPC.mdl))
+confint(lm1.1)
+
+```
+
+Графичеcки то выглядит следующим образом
+
+```{r}
+plot(SCandPC.mdl$SC~SCandPC.mdl$PC,xlab="Personal Computers, pcs", ylab="Service calls, pcs",main="Number of service calls by the number of computers",pch=19)
+abline(lm1.1,col="red",lwd=2)
+```
+#### Модель c учетом размеров предприятия
+
+Как видно на предыдущем рисунке, имеются определенные провалы в данных. Для того, чтобы их избежать сгенерируем для построения модели случайные данные, равные сумме двух случаных событий.
+
+ИНыми словами, симулируем определенное количество случайных событий для неких абстрактных холдингов, включающих в себя два случаынйх предприятия с известным количеством персональных компьютеров, равных их сумме и известным количеством обращений, также равным сумме обращений.
+
+```{r}
+set.seed(2014)
+rows<-nrow(SCandPC.mdl)
+iid1<-sample(1:rows,2000,replace=T)
+iid2<-sample(1:rows,2000,replace=T)
+ 
+test<-data.frame(PC=SCandPC.mdl$PC[iid1]+SCandPC.mdl$PC[iid2],SC=SCandPC.mdl$SC[iid1]+SCandPC.mdl$SC[iid2])
+dim(test)
+```
+Снова определим коэффициенты линейной модели
+
+```{r}
+summary(lm1.2<-lm(SC~PC-1,data=test))
+confint(lm1.2)
+
+```
+
+Также предположим, что существуют три типа предприятий: малое, среднее и большое, для которых происходит качественное изменение в количестве обращений. Найдем эти границы сравнивая линейные модели по критерию Акаике.
+
+```{r}
+z.min<-c()
+z.max<-c()
+z.aic<-c()
+for(i in seq(0,3000,by=50)) for(j in seq(50,2950,by=50)) {
+  z.min<-c(z.min,i)  
+  z.max<-c(z.max,j) 
+  test$type<-"M"
+  test$type[test$SC<i]<-"S"
+  test$type[test$SC>j]<-"L"
+  lmp<-lm(SC~PC+type-1,data=test)
+  z.aic<-c(z.aic,AIC(lmp))
+}
+print(x1<-z.min[which(z.aic==min(z.aic))])
+print(x2<-z.max[which(z.aic==min(z.aic))])
+
+```
+
+Построим результирующую линейную регрессию
+
+```{r x1,warning=FALSE}
+test$type<-"M"
+test$type[test$PC<x1[1]]<-"S"
+test$type[test$PC>x2[1]]<-"L"
+summary(lmp<-lm(SC~PC+type-1,data=test))
+confint(lmp) 
+plot(test$SC~test$PC,pch=19,col="grey",cex=0.5,xlab="Personal Computers, pcs", ylab="Service calls, pcs",main="Number of service calls by the number of computers")
+points(SCandPC.mdl$SC~SCandPC.mdl$PC,pch=19)
+
+abline(lm1.2,col="red",lwd=2)
+
+fit1<-data.frame(PC<-1:3000)
+fit1$type<-"M"
+fit1$type[fit1$PC<x1[1]]<-"S"
+fit1$type[fit1$PC>x2[1]]<-"L"
+fit1$SC<-predict(lmp,newdata=fit1)
+lines(fit1$PC,fit1$SC,col="blue")
+```
+Проведем дисперсионный анализ моделей
+
+```{r}
+anova(lm1.2,lmp)
+
+```
+
+#### Многоуровневая модель
+
+Подберем многоуровневую модель. Для начала предыдущую модель.
+
+```{r}
+library(lme4)
+summary(M0<-lmer(SC~PC+(1|type),data=test))
+coef(M0)
+summary(M1<-lmer(SC~PC+(1+PC|type),data=test))
+coef(M1)
+plot(test$SC~test$PC,pch=19,col="grey",cex=0.5,xlab="Personal Computers, pcs", ylab="Service calls, pcs",main="Number of service calls by the number of computers")
+points(SCandPC.mdl$SC~SCandPC.mdl$PC,pch=19)
+
+points(test$PC,predict(M1),col="blue",pch=19,lwd=2)
+abline(lm1.1,col="red",lwd=2)
+anova(M0,M1)
+```
+
+### Проверка качества модели
+
+Функция, вычисляющая данные по модели
+```{r}
+test.fun<-function(PC,minX,maxX) {
+  z<-ifelse(PC<minX,3,ifelse(PC>maxX,1,2))
+  coef(M1)$type[z,1]+coef(M1)$type[z,2]*PC
+}
+
+```
+Оценка точности прогнозирования
+```{r}
+fit<-test.fun(SCandPC.test$PC,x1[1],x2[1])
+plot(fit,SCandPC.test$SC-fit,pch=1)
+# R2 calc
+1-sum((SCandPC.test$SC-fit)^2)/sum((SCandPC.test$SC-mean(SCandPC.test$SC))^2)
+mean(abs(SCandPC.test$SC-fit)/SCandPC.test$SC*100)
+```
+
+Иной способ расчетов
+```{r}
+1-sum((SCandPC.test$SC-SCandPC.test$PC)^2)/sum((SCandPC.test$SC-mean(SCandPC.test$SC))^2)
+mean(abs(SCandPC.test$SC-SCandPC.test$PC)/SCandPC.test$SC*100)
+mean(SCandPC.test$SC-SCandPC.test$PC)
+sd(SCandPC.test$SC-SCandPC.test$PC)
+```
+
