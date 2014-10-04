@@ -61,6 +61,7 @@ summary(lm(y~x))
 
 ```{r}
 total.rows<-dim(SCandPC.raw)[1]
+set.seed(118)
 test.idx<-sample(1:total.rows,total.rows/4)
 SCandPC.test<-SCandPC.raw[test.idx,]
 dim(SCandPC.test)
@@ -81,20 +82,22 @@ confint(lm1)
 ```{r}
 summary(lm1.1<-lm(SC~PC-1,data=SCandPC.mdl))
 confint(lm1.1)
-
+sd(residuals(lm1.1))
 ```
 
-Графичеcки то выглядит следующим образом
+Графичеcки это выглядит следующим образом
 
 ```{r}
 plot(SCandPC.mdl$SC~SCandPC.mdl$PC,xlab="Personal Computers, pcs", ylab="Service calls, pcs",main="Number of service calls by the number of computers",pch=19)
 abline(lm1.1,col="red",lwd=2)
 ```
+
+
 #### Модель c учетом размеров предприятия
 
 Как видно на предыдущем рисунке, имеются определенные провалы в данных. Для того, чтобы их избежать сгенерируем для построения модели случайные данные, равные сумме двух случаных событий.
 
-ИНыми словами, симулируем определенное количество случайных событий для неких абстрактных холдингов, включающих в себя два случаынйх предприятия с известным количеством персональных компьютеров, равных их сумме и известным количеством обращений, также равным сумме обращений.
+Иными словами, симулируем определенное количество случайных событий для неких абстрактных холдингов, включающих в себя два случайных предприятия с известным количеством персональных компьютеров, равных их сумме и известным количеством обращений, также равным сумме обращений.
 
 ```{r}
 set.seed(2014)
@@ -153,6 +156,7 @@ fit1$type[fit1$PC>x2[1]]<-"L"
 fit1$SC<-predict(lmp,newdata=fit1)
 lines(fit1$PC,fit1$SC,col="blue")
 ```
+
 Проведем дисперсионный анализ моделей
 
 ```{r}
@@ -162,7 +166,7 @@ anova(lm1.2,lmp)
 
 #### Многоуровневая модель
 
-Подберем многоуровневую модель. Для начала предыдущую модель.
+Подберем многоуровневую модель. Для начала построим предыдущую модель, а затем  проведем дисперсионный анализ моделей
 
 ```{r}
 library(lme4)
@@ -178,30 +182,4 @@ abline(lm1.1,col="red",lwd=2)
 anova(M0,M1)
 ```
 
-### Проверка качества модели
-
-Функция, вычисляющая данные по модели
-```{r}
-test.fun<-function(PC,minX,maxX) {
-  z<-ifelse(PC<minX,3,ifelse(PC>maxX,1,2))
-  coef(M1)$type[z,1]+coef(M1)$type[z,2]*PC
-}
-
-```
-Оценка точности прогнозирования
-```{r}
-fit<-test.fun(SCandPC.test$PC,x1[1],x2[1])
-plot(fit,SCandPC.test$SC-fit,pch=1)
-# R2 calc
-1-sum((SCandPC.test$SC-fit)^2)/sum((SCandPC.test$SC-mean(SCandPC.test$SC))^2)
-mean(abs(SCandPC.test$SC-fit)/SCandPC.test$SC*100)
-```
-
-Иной способ расчетов
-```{r}
-1-sum((SCandPC.test$SC-SCandPC.test$PC)^2)/sum((SCandPC.test$SC-mean(SCandPC.test$SC))^2)
-mean(abs(SCandPC.test$SC-SCandPC.test$PC)/SCandPC.test$SC*100)
-mean(SCandPC.test$SC-SCandPC.test$PC)
-sd(SCandPC.test$SC-SCandPC.test$PC)
-```
-
+Как видно из расчетов, вторая модель оказывается лучше.
