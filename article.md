@@ -3,6 +3,8 @@
 
 
 Целью анализа является построение модели, выявлеющей закономерность в количестве обращений пользователей от числа обслуживаемых рабочих мест.
+Опубликовано:
+*Тушавин В. Многоуровневый регрессионный анализ зависимости количества обращений пользователей от числа обслуживаемых рабочих мест // Системы управления и информационные технологии. 2014. № 3.2 (57). С. 278–280.*
 
 ### Получение данных
 
@@ -71,19 +73,19 @@ summary(lm0<-lm(SC~PC,data=SCandPC.sum))
 ## lm(formula = SC ~ PC, data = SCandPC.sum)
 ## 
 ## Residuals:
-##    Min     1Q Median     3Q    Max 
-## -964.2 -238.9   39.5  226.8 1450.5 
+##     Min      1Q  Median      3Q     Max 
+## -964.16 -238.88   39.47  226.80 1450.52 
 ## 
 ## Coefficients:
-##             Estimate Std. Error t value Pr(>|t|)    
-## (Intercept) -708.884    579.648   -1.22     0.23    
-## PC             1.203      0.185    6.50  3.6e-08 ***
+##              Estimate Std. Error t value Pr(>|t|)    
+## (Intercept) -708.8841   579.6475  -1.223    0.227    
+## PC             1.2032     0.1851   6.499 3.65e-08 ***
 ## ---
 ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
 ## 
-## Residual standard error: 379 on 50 degrees of freedom
-## Multiple R-squared:  0.458,	Adjusted R-squared:  0.447 
-## F-statistic: 42.2 on 1 and 50 DF,  p-value: 3.65e-08
+## Residual standard error: 379.2 on 50 degrees of freedom
+## Multiple R-squared:  0.4579,	Adjusted R-squared:  0.4471 
+## F-statistic: 42.24 on 1 and 50 DF,  p-value: 3.646e-08
 ```
 
 ```r
@@ -91,7 +93,7 @@ oldpar<-par(mfrow=c(2,2))
 plot(lm0)
 ```
 
-![plot of chunk unnamed-chunk-2](./article_files/figure-html/unnamed-chunk-2.png) 
+![](./article_files/figure-html/unnamed-chunk-2-1.png) 
 
 ```r
 par(oldpar)
@@ -105,7 +107,7 @@ library(car)
 acf(residuals(lm0))
 ```
 
-![plot of chunk unnamed-chunk-3](./article_files/figure-html/unnamed-chunk-3.png) 
+![](./article_files/figure-html/unnamed-chunk-3-1.png) 
 
 ```r
 ncvTest(lm0)
@@ -114,7 +116,7 @@ ncvTest(lm0)
 ```
 ## Non-constant Variance Score Test 
 ## Variance formula: ~ fitted.values 
-## Chisquare = 0.6702    Df = 1     p = 0.413
+## Chisquare = 0.6701576    Df = 1     p = 0.4129967
 ```
 
 
@@ -133,17 +135,17 @@ summary(lm(y~x))
 ## lm(formula = y ~ x)
 ## 
 ## Residuals:
-##     Min      1Q  Median      3Q     Max 
-## -1005.7  -245.8    28.5   200.4  1394.7 
+##      Min       1Q   Median       3Q      Max 
+## -1005.68  -245.84    28.51   200.44  1394.69 
 ## 
 ## Coefficients:
 ##             Estimate Std. Error t value Pr(>|t|)
-## (Intercept)   -75.88     105.98   -0.72     0.48
-## x               2.86       3.48    0.82     0.41
+## (Intercept)  -75.876    105.982  -0.716    0.477
+## x              2.863      3.480   0.823    0.415
 ## 
-## Residual standard error: 377 on 50 degrees of freedom
-## Multiple R-squared:  0.0134,	Adjusted R-squared:  -0.00637 
-## F-statistic: 0.677 on 1 and 50 DF,  p-value: 0.415
+## Residual standard error: 376.6 on 50 degrees of freedom
+## Multiple R-squared:  0.01336,	Adjusted R-squared:  -0.006374 
+## F-statistic: 0.677 on 1 and 50 DF,  p-value: 0.4145
 ```
 
 Иными словами, остатки модели - белый шум. Построим другую модель, которая учитывает только зависимость количества обращений пользователей от числа обслуживаемых рабочих мест и не зависит от времени.
@@ -187,19 +189,19 @@ summary(lm1<-lm(SC~PC,data=SCandPC.mdl))
 ## lm(formula = SC ~ PC, data = SCandPC.mdl)
 ## 
 ## Residuals:
-##    Min     1Q Median     3Q    Max 
-## -481.0  -13.8    7.5   17.4  547.5 
+##     Min      1Q  Median      3Q     Max 
+## -481.03  -13.77    7.52   17.42  547.50 
 ## 
 ## Coefficients:
 ##             Estimate Std. Error t value Pr(>|t|)    
-## (Intercept)  -8.5490     4.9585   -1.72    0.085 .  
-## PC            1.0070     0.0109   92.17   <2e-16 ***
+## (Intercept) -8.54898    4.95846  -1.724   0.0853 .  
+## PC           1.00701    0.01093  92.171   <2e-16 ***
 ## ---
 ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
 ## 
-## Residual standard error: 92.4 on 480 degrees of freedom
-## Multiple R-squared:  0.947,	Adjusted R-squared:  0.946 
-## F-statistic: 8.5e+03 on 1 and 480 DF,  p-value: <2e-16
+## Residual standard error: 92.38 on 480 degrees of freedom
+## Multiple R-squared:  0.9465,	Adjusted R-squared:  0.9464 
+## F-statistic:  8496 on 1 and 480 DF,  p-value: < 2.2e-16
 ```
 
 ```r
@@ -207,9 +209,9 @@ confint(lm1)
 ```
 
 ```
-##                2.5 % 97.5 %
-## (Intercept) -18.2919  1.194
-## PC            0.9855  1.028
+##                   2.5 %   97.5 %
+## (Intercept) -18.2919435 1.193986
+## PC            0.9855465 1.028482
 ```
 
 Полученный результат хорошо согласуется с ранее опубликованной моделью. После исключения свободного члена получаем
@@ -225,18 +227,18 @@ summary(lm1.1<-lm(SC~PC-1,data=SCandPC.mdl))
 ## lm(formula = SC ~ PC - 1, data = SCandPC.mdl)
 ## 
 ## Residuals:
-##    Min     1Q Median     3Q    Max 
-## -476.0  -20.4    0.0    9.1  550.4 
+##     Min      1Q  Median      3Q     Max 
+## -475.97  -20.43    0.00    9.05  550.39 
 ## 
 ## Coefficients:
 ##    Estimate Std. Error t value Pr(>|t|)    
-## PC  0.99705    0.00929     107   <2e-16 ***
+## PC 0.997050   0.009291   107.3   <2e-16 ***
 ## ---
 ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
 ## 
-## Residual standard error: 92.6 on 481 degrees of freedom
-## Multiple R-squared:  0.96,	Adjusted R-squared:  0.96 
-## F-statistic: 1.15e+04 on 1 and 481 DF,  p-value: <2e-16
+## Residual standard error: 92.57 on 481 degrees of freedom
+## Multiple R-squared:  0.9599,	Adjusted R-squared:  0.9598 
+## F-statistic: 1.152e+04 on 1 and 481 DF,  p-value: < 2.2e-16
 ```
 
 ```r
@@ -244,8 +246,8 @@ confint(lm1.1)
 ```
 
 ```
-##     2.5 % 97.5 %
-## PC 0.9788  1.015
+##        2.5 %   97.5 %
+## PC 0.9787946 1.015306
 ```
 
 ```r
@@ -253,7 +255,7 @@ sd(residuals(lm1.1))
 ```
 
 ```
-## [1] 92.37
+## [1] 92.36843
 ```
 
 Графичеcки это выглядит следующим образом
@@ -264,7 +266,7 @@ plot(SCandPC.mdl$SC~SCandPC.mdl$PC,xlab="Personal Computers, pcs", ylab="Service
 abline(lm1.1,col="red",lwd=2)
 ```
 
-![plot of chunk unnamed-chunk-8](./article_files/figure-html/unnamed-chunk-8.png) 
+![](./article_files/figure-html/unnamed-chunk-8-1.png) 
 
 
 #### Модель c учетом размеров предприятия
@@ -300,18 +302,18 @@ summary(lm1.2<-lm(SC~PC-1,data=test))
 ## lm(formula = SC ~ PC - 1, data = test)
 ## 
 ## Residuals:
-##    Min     1Q Median     3Q    Max 
-## -558.3  -51.6   -5.5   19.3  760.6 
+##     Min      1Q  Median      3Q     Max 
+## -558.31  -51.61   -5.47   19.30  760.56 
 ## 
 ## Coefficients:
 ##    Estimate Std. Error t value Pr(>|t|)    
-## PC  0.98765    0.00388     255   <2e-16 ***
+## PC 0.987647   0.003876   254.8   <2e-16 ***
 ## ---
 ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
 ## 
-## Residual standard error: 127 on 1999 degrees of freedom
-## Multiple R-squared:  0.97,	Adjusted R-squared:  0.97 
-## F-statistic: 6.49e+04 on 1 and 1999 DF,  p-value: <2e-16
+## Residual standard error: 127.3 on 1999 degrees of freedom
+## Multiple R-squared:  0.9701,	Adjusted R-squared:  0.9701 
+## F-statistic: 6.494e+04 on 1 and 1999 DF,  p-value: < 2.2e-16
 ```
 
 ```r
@@ -319,8 +321,8 @@ confint(lm1.2)
 ```
 
 ```
-##    2.5 % 97.5 %
-## PC  0.98 0.9952
+##        2.5 %    97.5 %
+## PC 0.9800465 0.9952481
 ```
 
 Также предположим, что существуют три типа предприятий: малое, среднее и большое, для которых происходит качественное изменение в количестве обращений. Найдем эти границы сравнивая линейные модели по критерию Акаике.
@@ -370,21 +372,21 @@ summary(lmp<-lm(SC~PC+type-1,data=test))
 ## lm(formula = SC ~ PC + type - 1, data = test)
 ## 
 ## Residuals:
-##    Min     1Q Median     3Q    Max 
-## -569.7  -44.0    8.4   32.1  764.6 
+##     Min      1Q  Median      3Q     Max 
+## -569.74  -43.98    8.35   32.06  764.60 
 ## 
 ## Coefficients:
-##       Estimate Std. Error t value Pr(>|t|)    
-## PC      0.9566     0.0124   76.84   <2e-16 ***
-## typeL  60.1808    25.2032    2.39   0.0170 *  
-## typeM  45.8208    14.0696    3.26   0.0011 ** 
-## typeS -12.6632     4.0550   -3.12   0.0018 ** 
+##        Estimate Std. Error t value Pr(>|t|)    
+## PC      0.95661    0.01245  76.844  < 2e-16 ***
+## typeL  60.18076   25.20321   2.388  0.01704 *  
+## typeM  45.82085   14.06962   3.257  0.00115 ** 
+## typeS -12.66324    4.05504  -3.123  0.00182 ** 
 ## ---
 ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
 ## 
-## Residual standard error: 126 on 1996 degrees of freedom
-## Multiple R-squared:  0.971,	Adjusted R-squared:  0.971 
-## F-statistic: 1.66e+04 on 4 and 1996 DF,  p-value: <2e-16
+## Residual standard error: 126.1 on 1996 degrees of freedom
+## Multiple R-squared:  0.9707,	Adjusted R-squared:  0.9707 
+## F-statistic: 1.656e+04 on 4 and 1996 DF,  p-value: < 2.2e-16
 ```
 
 ```r
@@ -392,11 +394,11 @@ confint(lmp)
 ```
 
 ```
-##          2.5 %  97.5 %
-## PC      0.9322   0.981
-## typeL  10.7534 109.608
-## typeM  18.2282  73.414
-## typeS -20.6158  -4.711
+##             2.5 %      97.5 %
+## PC      0.9321914   0.9810189
+## typeL  10.7533951 109.6081213
+## typeM  18.2281630  73.4135344
+## typeS -20.6157929  -4.7106849
 ```
 
 ```r
@@ -413,7 +415,7 @@ fit1$SC<-predict(lmp,newdata=fit1)
 lines(fit1$PC,fit1$SC,col="blue")
 ```
 
-![plot of chunk x1](./article_files/figure-html/x1.png) 
+![](./article_files/figure-html/x1-1.png) 
 
 Проведем дисперсионный анализ моделей
 
@@ -427,9 +429,9 @@ anova(lm1.2,lmp)
 ## 
 ## Model 1: SC ~ PC - 1
 ## Model 2: SC ~ PC + type - 1
-##   Res.Df      RSS Df Sum of Sq    F  Pr(>F)    
-## 1   1999 32388887                              
-## 2   1996 31733306  3    655581 13.8 7.1e-09 ***
+##   Res.Df      RSS Df Sum of Sq      F    Pr(>F)    
+## 1   1999 32388887                                  
+## 2   1996 31733306  3    655581 13.745 7.121e-09 ***
 ## ---
 ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
 ```
@@ -457,11 +459,11 @@ summary(M0<-lmer(SC~PC+(1|type),data=test))
 ## Formula: SC ~ PC + (1 | type)
 ##    Data: test
 ## 
-## REML criterion at convergence: 25032
+## REML criterion at convergence: 25031.7
 ## 
 ## Scaled residuals: 
-##    Min     1Q Median     3Q    Max 
-## -4.519 -0.351  0.070  0.256  6.070 
+##     Min      1Q  Median      3Q     Max 
+## -4.5190 -0.3511  0.0697  0.2560  6.0695 
 ## 
 ## Random effects:
 ##  Groups   Name        Variance Std.Dev.
@@ -471,8 +473,8 @@ summary(M0<-lmer(SC~PC+(1|type),data=test))
 ## 
 ## Fixed effects:
 ##             Estimate Std. Error t value
-## (Intercept)  23.8401    23.3199     1.0
-## PC            0.9630     0.0115    83.5
+## (Intercept) 23.84011   23.31992    1.02
+## PC           0.96302    0.01153   83.49
 ## 
 ## Correlation of Fixed Effects:
 ##    (Intr)
@@ -485,10 +487,10 @@ coef(M0)
 
 ```
 ## $type
-##   (Intercept)    PC
-## L       46.19 0.963
-## M       38.79 0.963
-## S      -13.46 0.963
+##   (Intercept)        PC
+## L    46.19156 0.9630203
+## M    38.78765 0.9630203
+## S   -13.45890 0.9630203
 ## 
 ## attr(,"class")
 ## [1] "coef.mer"
@@ -503,23 +505,23 @@ summary(M1<-lmer(SC~PC+(1+PC|type),data=test))
 ## Formula: SC ~ PC + (1 + PC | type)
 ##    Data: test
 ## 
-## REML criterion at convergence: 24862
+## REML criterion at convergence: 24861.8
 ## 
 ## Scaled residuals: 
-##    Min     1Q Median     3Q    Max 
-## -4.838 -0.276 -0.057  0.202  6.143 
+##     Min      1Q  Median      3Q     Max 
+## -4.8384 -0.2756 -0.0571  0.2016  6.1430 
 ## 
 ## Random effects:
-##  Groups   Name        Variance Std.Dev. Corr 
-##  type     (Intercept) 1.48e+04 121.491       
-##           PC          6.49e-02   0.255  -1.00
-##  Residual             1.46e+04 120.629       
+##  Groups   Name        Variance  Std.Dev. Corr 
+##  type     (Intercept) 1.476e+04 121.4913      
+##           PC          6.494e-02   0.2548 -1.00
+##  Residual             1.455e+04 120.6293      
 ## Number of obs: 2000, groups:  type, 3
 ## 
 ## Fixed effects:
 ##             Estimate Std. Error t value
-## (Intercept)  -78.414     70.371   -1.11
-## PC             0.997      0.147    6.77
+## (Intercept) -78.4135    70.3705  -1.114
+## PC            0.9970     0.1472   6.773
 ## 
 ## Correlation of Fixed Effects:
 ##    (Intr)
@@ -532,10 +534,10 @@ coef(M1)
 
 ```
 ## $type
-##   (Intercept)     PC
-## L     -101.94 1.0464
-## M     -148.94 1.1449
-## S       15.65 0.7997
+##   (Intercept)        PC
+## L  -101.94126 1.0463568
+## M  -148.94478 1.1449467
+## S    15.64548 0.7997185
 ## 
 ## attr(,"class")
 ## [1] "coef.mer"
@@ -549,7 +551,7 @@ points(test$PC,predict(M1),col="blue",pch=19,lwd=2)
 abline(lm1.1,col="red",lwd=2)
 ```
 
-![plot of chunk unnamed-chunk-13](./article_files/figure-html/unnamed-chunk-13.png) 
+![](./article_files/figure-html/unnamed-chunk-13-1.png) 
 
 ```r
 anova(M0,M1)
@@ -564,11 +566,45 @@ anova(M0,M1)
 ## Models:
 ## M0: SC ~ PC + (1 | type)
 ## M1: SC ~ PC + (1 + PC | type)
-##    Df   AIC   BIC logLik deviance Chisq Chi Df Pr(>Chisq)    
-## M0  4 25040 25062 -12516    25032                            
-## M1  6 24877 24911 -12432    24865   167      2     <2e-16 ***
+##    Df   AIC   BIC logLik deviance  Chisq Chi Df Pr(>Chisq)    
+## M0  4 25040 25062 -12516    25032                             
+## M1  6 24877 24911 -12432    24865 167.03      2  < 2.2e-16 ***
 ## ---
 ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
 ```
 
 Как видно из расчетов, вторая модель оказывается лучше.
+
+Необходимые коэффициенты:
+
+```r
+confint(M1,method="Wald")
+```
+
+```
+##                    2.5 %    97.5 %
+## (Intercept) -216.3371756 59.510132
+## PC             0.7084818  1.285533
+```
+
+```r
+fixef(M1)
+```
+
+```
+## (Intercept)          PC 
+## -78.4135219   0.9970074
+```
+
+```r
+ranef(M1)
+```
+
+```
+## $type
+##   (Intercept)          PC
+## L   -23.52774  0.04934946
+## M   -70.53126  0.14793939
+## S    94.05900 -0.19728885
+```
+
